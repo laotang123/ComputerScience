@@ -77,6 +77,7 @@ public class GraphLJF {
       }
     }
 
+    //TODO: 通过visited设置为true的数量是否等于顶点总数量进行提前终止程序操作
     //使用队列进行先进先出遍历
     while (!queue.isEmpty()) {
       Integer v = queue.poll();
