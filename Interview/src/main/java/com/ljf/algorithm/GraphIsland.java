@@ -12,6 +12,26 @@ import java.util.Queue;
  * @modified By：
  * @version: $ 1.0
  */
+
+//BFS最近海域定义的类
+class Coordinate {
+    int x;
+    int y;
+    int dist;
+
+    Coordinate(int i, int j) {
+        this.x = i;
+        this.y = j;
+        this.dist = 0;
+    }
+
+    Coordinate(int i, int j, int dist) {
+        this.x = i;
+        this.y = j;
+        this.dist = dist;
+    }
+}
+
 public class GraphIsland {
     /**
      * dfs查找岛屿
@@ -92,6 +112,76 @@ public class GraphIsland {
 
     }
 
+    /**
+     * 计算海洋区域中离他最近的陆地中距离最大的；BFS实现，BFS的遍历方式刚好符合曼哈顿距离公式计算
+     *
+     * @param grid
+     * @return
+     */
+    public int maxDistance(int[][] grid) {
+        int res = 0;
+        if (grid == null || grid.length == 0) {
+            return res;
+        }
+
+        int m = grid.length;
+        int n = grid[0].length;
+
+        int tmpDist;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 0) {
+                    tmpDist = findNearestDistance(grid, i, j, m, n);
+                    if(tmpDist == 0) return 0;
+                    res = Math.max(res, tmpDist);
+                }
+            }
+        }
+
+        return res;
+    }
+
+    /**
+     * 使用BFS获取当前海域到陆地最近的曼哈顿距离
+     *
+     * @param grid
+     * @param i
+     * @param j
+     * @param m
+     * @param n
+     * @return
+     */
+    private int findNearestDistance(int[][] grid, int i, int j, int m, int n) {
+        Queue<Coordinate> queue = new LinkedList<>();
+
+        int[] dx = {-1, 1, 0, 0};
+        int[] dy = {0, 0, -1, 1};
+        queue.offer(new Coordinate(i, j));
+
+        //标记是否访问过该节点
+        boolean[][] visited = new boolean[m][n];
+        Coordinate tmp;
+        int x, y;
+        while (!queue.isEmpty()) {
+            tmp = queue.poll();
+
+            //广度遍历，第一次遇到1节点即为距离陆地最近距离
+            for (int k = 0; k < dx.length; k++) {
+                x = tmp.x + dx[k];
+                y = tmp.y + dy[k];
+
+                if (x < 0 || x >= m || y < 0 || y >= n) continue;
+                queue.offer(new Coordinate(x, y, tmp.dist + 1));
+
+                //第一次遇到陆地 1
+                if (grid[x][y] == 1) return tmp.dist + 1;
+            }
+        }
+
+        return 0;
+    }
+
+
     public static void main(String[] args) {
         GraphIsland graph = new GraphIsland();
 //        char[][] grid = {
@@ -99,11 +189,18 @@ public class GraphIsland {
 //                {'1', '1', '0', '1', '0'},
 //                {'1', '1', '0', '0', '0'},
 //                {'0', '0', '0', '0', '0'}};
-        char[][] grid = {
-                {'1', '1', '1'},
-                {'0', '1', '0'},
-                {'0', '1', '0'}};
+//        char[][] grid = {
+//                {'1', '1', '1'},
+//                {'0', '1', '0'},
+//                {'0', '1', '0'}};
+//
+//        System.out.println(graph.numIslands(grid));
 
-        System.out.println(graph.numIslands(grid));
+        int[][] grid = {
+                {1, 0, 1},
+                {0, 0, 0},
+                {1, 0, 1}
+        };
+        System.out.println(graph.maxDistance(grid));
     }
 }
